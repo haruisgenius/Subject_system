@@ -3,9 +3,11 @@ package com.example.Subject_system.contants;
 public enum RtnCode {
 
 	SUCCESSFUL("200", "Successful!!"),
-	DATA_ERROR("404", "Misinput!!"),
+	DATA_MISINPUT("404", "Misinput!!"),
+	DATA_ERROR("404", "Data Error!!"),
 	DATA_IS_EMPTY("404", "Data Not Found!!"),
-	TAKE_COURSE_NOTYET("404", "Please take course, first!!");
+	TAKE_COURSE_NOTYET("404", "Please take course, first!!"),
+	UPDATE_NOT_ALLOW("404", "This Update Is Not Allow!!");
 	
 	private String code;
 	

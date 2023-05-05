@@ -40,69 +40,66 @@ public class SubjectSystemServiceImpl implements SubjectSystemService {
 
 		// 檢查課程名稱
 		if (subjectSystemRequest.getCourseName().isBlank()) {
-			return new SubjectSystemResponse("資料錯誤:課程名稱為空");
+			return new SubjectSystemResponse(RtnCode.DATA_MISINPUT.getMessage());
 		}
 
 		// 檢查星期
 		List<String> week = Arrays.asList("一", "二", "三", "四", "五");
 		if (subjectSystemRequest.getWeekDay().isEmpty()) {
-			return new SubjectSystemResponse("資料錯誤:上課日期為空");
+			return new SubjectSystemResponse(RtnCode.DATA_MISINPUT.getMessage());
 		}
 		if (!week.contains(subjectSystemRequest.getWeekDay())) {
-			return new SubjectSystemResponse("資料錯誤:上課日期錯誤");
+			return new SubjectSystemResponse(RtnCode.DATA_MISINPUT.getMessage());
 		}
 
 		// 檢查上課時間and下課時間
 		if (subjectSystemRequest.getStartTime().getHour() < 8 || subjectSystemRequest.getStartTime().getHour() > 20
 				|| subjectSystemRequest.getEndTime().getHour() < 8
 				|| subjectSystemRequest.getEndTime().getHour() > 20) {
-			return new SubjectSystemResponse("資料錯誤:上課時間錯誤");
+			return new SubjectSystemResponse(RtnCode.DATA_MISINPUT.getMessage());
 		}
 		if (subjectSystemRequest.getStartTime().getHour() > subjectSystemRequest.getEndTime().getHour()) {
-			return new SubjectSystemResponse("資料錯誤:上課時間格式錯誤");
+			return new SubjectSystemResponse(RtnCode.DATA_MISINPUT.getMessage());
 		}
 
 		// 檢查學分數
 		if (subjectSystemRequest.getCredits() < 1 || subjectSystemRequest.getCredits() > 3) {
-			return new SubjectSystemResponse("資料錯誤:學分錯誤");
+			return new SubjectSystemResponse(RtnCode.DATA_MISINPUT.getMessage());
 		}
 
 		// 檢查代碼是否已存在
 		if (courseDao.existsById(subjectSystemRequest.getCourseNumber())) {
-			return new SubjectSystemResponse("資料錯誤:課程代碼重複");
+			return new SubjectSystemResponse(RtnCode.DATA_MISINPUT.getMessage());
 		}
 		// 存資料庫
 		Course saveCourse = new Course(subjectSystemRequest.getCourseNumber(), subjectSystemRequest.getCourseName(),
 				subjectSystemRequest.getWeekDay(), subjectSystemRequest.getStartTime(),
 				subjectSystemRequest.getEndTime(), subjectSystemRequest.getCredits());
 		courseDao.save(saveCourse);
-		return new SubjectSystemResponse(saveCourse, "新增課程成功");
+		return new SubjectSystemResponse(saveCourse, RtnCode.SUCCESSFUL.getMessage());
 	}
 
 //	新增學生
 	@Override
 	public SubjectSystemResponse addStudent(SubjectSystemRequest subjectSystemRequest) {
 		// 檢查學號
-		if (subjectSystemRequest.getStudentNumber().isBlank()) {
-			return new SubjectSystemResponse("資料錯誤:學號為空");
-		}
-		String pattern = "[\\w^_]{5,8}";
-		if (!subjectSystemRequest.getStudentNumber().matches(pattern)) {
-			return new SubjectSystemResponse("資料錯誤:學號格式不符");
+		SubjectSystemResponse checkResult = checkStudentNumber(subjectSystemRequest.getStudentNumber());
+		if(checkResult != null) {
+			return checkResult;
 		}
 		// 檢查學生姓名是否為空
 		if (subjectSystemRequest.getStudentName().isBlank()) {
-			return new SubjectSystemResponse("資料錯誤:姓名為空");
+			return new SubjectSystemResponse(RtnCode.DATA_MISINPUT.getMessage());
 		}
 		// 學號是否重複
 		if (studentDao.existsById(subjectSystemRequest.getStudentNumber())) {
-			return new SubjectSystemResponse("資料錯誤:學生資料已存在");
+			return new SubjectSystemResponse(RtnCode.DATA_MISINPUT.getMessage());
 		}
 		// 存資料庫
 		Student saveStudent = new Student(subjectSystemRequest.getStudentNumber(),
 				subjectSystemRequest.getStudentName());
 		studentDao.save(saveStudent);
-		return new SubjectSystemResponse(saveStudent, "新增學生成功");
+		return new SubjectSystemResponse(saveStudent, RtnCode.SUCCESSFUL.getMessage());
 	}
 
 //	刪除課程
@@ -115,14 +112,14 @@ public class SubjectSystemServiceImpl implements SubjectSystemService {
 		// 檢查課程是否存在
 		Optional<Course> op = courseDao.findById(subjectSystemRequest.getCourseNumber());
 		if (!op.isPresent()) {
-			return new SubjectSystemResponse("課程不存在");
+			return new SubjectSystemResponse(RtnCode.DATA_IS_EMPTY.getMessage());
 		}
 		// 檢查此課程修課人數是否>0
 		if (op.get().getCourseStudent() > 0) {
-			return new SubjectSystemResponse("課程無法刪除");
+			return new SubjectSystemResponse(RtnCode.UPDATE_NOT_ALLOW.getMessage());
 		}
 		courseDao.deleteById(subjectSystemRequest.getCourseNumber());
-		return new SubjectSystemResponse("刪除課程成功");
+		return new SubjectSystemResponse(RtnCode.SUCCESSFUL.getMessage());
 	}
 
 //	查詢課程(課程代碼)
@@ -135,10 +132,10 @@ public class SubjectSystemServiceImpl implements SubjectSystemService {
 		// 檢查課程是否存在
 		Optional<Course> op = courseDao.findById(subjectSystemRequest.getCourseNumber());
 		if (!op.isPresent()) {
-			return new SubjectSystemResponse("課程不存在");
+			return new SubjectSystemResponse(RtnCode.DATA_IS_EMPTY.getMessage());
 		}
 		Course courseInfo = op.get();
-		return new SubjectSystemResponse(courseInfo, "取得課程資料成功");
+		return new SubjectSystemResponse(courseInfo, RtnCode.SUCCESSFUL.getMessage());
 	}
 
 //	查詢課程(課程名稱)
@@ -146,15 +143,15 @@ public class SubjectSystemServiceImpl implements SubjectSystemService {
 	public SubjectSystemResponse findCourseByCourseName(SubjectSystemRequest subjectSystemRequest) {
 		// 檢查課程名稱
 		if (subjectSystemRequest.getCourseName().isBlank()) {
-			return new SubjectSystemResponse("資料錯誤:課程名稱為空");
+			return new SubjectSystemResponse(RtnCode.DATA_MISINPUT.getMessage());
 		}
 		List<Course> findCourseNameList = courseDao
 				.findByCourseNameContainingIgnoreCase(subjectSystemRequest.getCourseName());
 		// 檢查課程是否存在
 		if (findCourseNameList.isEmpty()) {
-			return new SubjectSystemResponse("資料錯誤:相關課程不存在");
+			return new SubjectSystemResponse(RtnCode.DATA_IS_EMPTY.getMessage());
 		}
-		return new SubjectSystemResponse(findCourseNameList, "取得課程資料成功");
+		return new SubjectSystemResponse(findCourseNameList, RtnCode.SUCCESSFUL.getMessage());
 	}
 
 //	修改課程
@@ -242,6 +239,7 @@ public class SubjectSystemServiceImpl implements SubjectSystemService {
 	}
 
 //	選課
+//	選課
 	@Override
 	public SubjectSystemResponse takeCourse(SubjectSystemRequest subjectSystemRequest) {
 		// 判斷學號輸入內容格式
@@ -254,7 +252,7 @@ public class SubjectSystemServiceImpl implements SubjectSystemService {
 		Student student = studentOp.get();
 
 		if (!studentOp.isPresent()) {
-			return new SubjectSystemResponse("資料錯誤:此學生不存在");
+			return new SubjectSystemResponse(RtnCode.DATA_IS_EMPTY.getMessage());
 		}
 
 		// 檢查輸入課程代碼格式
@@ -268,19 +266,19 @@ public class SubjectSystemServiceImpl implements SubjectSystemService {
 //			課程不存在
 		List<Course> takeCourseList = courseDao.findAllById(subjectSystemRequest.getCourseNumberList());
 		if (CollectionUtils.isEmpty(takeCourseList)) {
-			return new SubjectSystemResponse("課程不存在");
+			return new SubjectSystemResponse(RtnCode.DATA_IS_EMPTY.getMessage());
 		} else if (takeCourseList.size() != subjectSystemRequest.getCourseNumberList().size()) {
-			return new SubjectSystemResponse("課程不存在");
+			return new SubjectSystemResponse(RtnCode.DATA_IS_EMPTY.getMessage());
 		}
 
 		// 檢查課程代碼是否重複
 		for (int i = 0; i < takeCourseList.size(); i++) {
 			for (int j = i + 1; j < takeCourseList.size(); j++) {
 				if (takeCourseList.get(i).getCourseNumber().equals(takeCourseList.get(j).getCourseNumber())) {
-					return new SubjectSystemResponse("無法選修相同課程");
+					return new SubjectSystemResponse(RtnCode.UPDATE_NOT_ALLOW.getMessage());
 				} else if (takeCourseList.get(i).getCourseName()
 						.equalsIgnoreCase(takeCourseList.get(j).getCourseName())) {
-					return new SubjectSystemResponse("無法選修相同課程");
+					return new SubjectSystemResponse(RtnCode.UPDATE_NOT_ALLOW.getMessage());
 				}
 			}
 		}
@@ -291,7 +289,7 @@ public class SubjectSystemServiceImpl implements SubjectSystemService {
 				if (takeCourseList.get(i).getWeekDay().equals(takeCourseList.get(j).getWeekDay())) {
 					if (!takeCourseList.get(j).getStartTime().isAfter(takeCourseList.get(i).getEndTime())
 							&& !takeCourseList.get(j).getEndTime().isBefore(takeCourseList.get(i).getStartTime())) {
-						return new SubjectSystemResponse("選修課程時間衝突");
+						return new SubjectSystemResponse(RtnCode.UPDATE_NOT_ALLOW.getMessage());
 					}
 				}
 			}
@@ -300,7 +298,7 @@ public class SubjectSystemServiceImpl implements SubjectSystemService {
 		// 檢查課程選修人數是否達上限
 		for (Course takeCourse : takeCourseList) {
 			if (takeCourse.getCourseStudent() >= 3) {
-				return new SubjectSystemResponse("課程已達選修人數限制");
+				return new SubjectSystemResponse(RtnCode.UPDATE_NOT_ALLOW.getMessage());
 			}
 		}
 
@@ -313,7 +311,7 @@ public class SubjectSystemServiceImpl implements SubjectSystemService {
 		}
 		// 檢查學生最終總學分是否已達上限
 		if (takeCourseTotalCredits >= 10) {
-			return new SubjectSystemResponse("選修學分已達上限");
+			return new SubjectSystemResponse(RtnCode.UPDATE_NOT_ALLOW.getMessage());
 		}
 		student.setTotalCredits(takeCourseTotalCredits);
 		studentDao.save(student);
@@ -345,8 +343,10 @@ public class SubjectSystemServiceImpl implements SubjectSystemService {
 			takeCourse.setCourseStudent(sltTotalStudent);
 			courseDao.save(takeCourse);
 		}
-		return new SubjectSystemResponse(student, finallyTakeCouseList, "選修課程成功");
+		return new SubjectSystemResponse(student, finallyTakeCouseList, RtnCode.SUCCESSFUL.getMessage());
 	}
+	
+//	加選課程
 	
 //	加課
 
@@ -365,7 +365,7 @@ public class SubjectSystemServiceImpl implements SubjectSystemService {
 		Student student = studentOp.get();
 
 		if (!studentOp.isPresent()) {
-			return new SubjectSystemResponse("資料錯誤:此學生不存在");
+			return new SubjectSystemResponse(RtnCode.DATA_IS_EMPTY.getMessage());
 		}
 
 		// 檢查輸入課程代碼格式
@@ -378,15 +378,15 @@ public class SubjectSystemServiceImpl implements SubjectSystemService {
 
 //		(檢查課程)
 		if (studentOp.get().getTakeCourseNumber().isEmpty()) {
-			return new SubjectSystemResponse("請先選課");
+			return new SubjectSystemResponse(RtnCode.TAKE_COURSE_NOTYET.getMessage());
 		}
 
 //		檢查課程不存在
 		List<Course> takeCourseList = courseDao.findAllById(subjectSystemRequest.getCourseNumberList());
 		if (CollectionUtils.isEmpty(takeCourseList)) {
-			return new SubjectSystemResponse("課程不存在");
+			return new SubjectSystemResponse(RtnCode.DATA_IS_EMPTY.getMessage());
 		} else if (takeCourseList.size() != subjectSystemRequest.getCourseNumberList().size()) {
-			return new SubjectSystemResponse("課程不存在");
+			return new SubjectSystemResponse(RtnCode.DATA_IS_EMPTY.getMessage());
 		}
 
 		// 把學生已選課程代號個別取出存進陣列
@@ -405,9 +405,9 @@ public class SubjectSystemServiceImpl implements SubjectSystemService {
 		for (Course stdCourse : stdCourseList) {
 			for (Course sltCourse : sltCourseList) {
 				if (stdCourse.getCourseNumber().equals(sltCourse.getCourseNumber())) {
-					return new SubjectSystemResponse("無法選修相同課程");
+					return new SubjectSystemResponse(RtnCode.UPDATE_NOT_ALLOW.getMessage());
 				} else if (stdCourse.getCourseName().equals(sltCourse.getCourseName())) {
-					return new SubjectSystemResponse("無法選修相同課程");
+					return new SubjectSystemResponse(RtnCode.UPDATE_NOT_ALLOW.getMessage());
 				}
 			}
 		}
@@ -423,7 +423,7 @@ public class SubjectSystemServiceImpl implements SubjectSystemService {
 				if (stdCourseTime.getWeekDay().equals(sltCourseTime.getWeekDay())) {
 					// 比對課堂時間是否衝堂
 					if (!str2.isAfter(end1) && !end2.isBefore(str1)) {
-						return new SubjectSystemResponse("選修課程時間衝突");
+						return new SubjectSystemResponse(RtnCode.UPDATE_NOT_ALLOW.getMessage());
 					}
 				}
 			}
@@ -432,7 +432,7 @@ public class SubjectSystemServiceImpl implements SubjectSystemService {
 //		(個別檢查選修人數是否達上限)
 		for (Course sltCourse : sltCourseList) {
 			if (sltCourse.getCourseStudent() >= 3) {
-				return new SubjectSystemResponse("課程已達選修人數限制");
+				return new SubjectSystemResponse(RtnCode.UPDATE_NOT_ALLOW.getMessage());
 			}
 		}
 
@@ -455,7 +455,7 @@ public class SubjectSystemServiceImpl implements SubjectSystemService {
 
 		// 檢查學生最終總學分是否已達上限
 		if (finalTotalCredit >= 10) {
-			return new SubjectSystemResponse("選修學分已達上限");
+			return new SubjectSystemResponse(RtnCode.UPDATE_NOT_ALLOW.getMessage());
 		}
 		student.setTotalCredits(finalTotalCredit);
 		studentDao.save(student);
@@ -498,8 +498,10 @@ public class SubjectSystemServiceImpl implements SubjectSystemService {
 			courseDao.save(sltCourse);
 		}
 
-		return new SubjectSystemResponse(student, finallyCouseList, "加選課程成功");
+		return new SubjectSystemResponse(student, finallyCouseList, RtnCode.SUCCESSFUL.getMessage());
 	}
+	
+//	退選課程
 	
 //	退課
 
@@ -515,7 +517,7 @@ public class SubjectSystemServiceImpl implements SubjectSystemService {
 		Student student = studentOp.get();
 
 		if (!studentOp.isPresent()) {
-			return new SubjectSystemResponse("此學生不存在");
+			return new SubjectSystemResponse(RtnCode.DATA_IS_EMPTY.getMessage());
 		}
 
 		// 檢查課程代碼
@@ -528,9 +530,9 @@ public class SubjectSystemServiceImpl implements SubjectSystemService {
 //		檢查課程不存在
 		List<Course> dropCourseList = courseDao.findAllById(subjectSystemRequest.getCourseNumberList());
 		if (CollectionUtils.isEmpty(dropCourseList)) {
-			return new SubjectSystemResponse("課程不存在");
+			return new SubjectSystemResponse(RtnCode.DATA_IS_EMPTY.getMessage());
 		} else if (dropCourseList.size() != subjectSystemRequest.getCourseNumberList().size()) {
-			return new SubjectSystemResponse("課程不存在");
+			return new SubjectSystemResponse(RtnCode.DATA_IS_EMPTY.getMessage());
 		}
 
 		// 學生已選課程代碼(字串)存進字串陣列
@@ -548,7 +550,7 @@ public class SubjectSystemServiceImpl implements SubjectSystemService {
 		// 檢查是否有選修欲退課程
 		for (String dropCourse : dropCourseNumStrList) {
 			if (!takeCourseNumStrList.contains(dropCourse)) {
-				return new SubjectSystemResponse("未選修此課程");
+				return new SubjectSystemResponse(RtnCode.DATA_IS_EMPTY.getMessage());
 			}
 		}
 
@@ -597,8 +599,10 @@ public class SubjectSystemServiceImpl implements SubjectSystemService {
 			courseDao.save(course);
 		}
 
-		return new SubjectSystemResponse(student, finallyTakeCouseList, "退選成功");
+		return new SubjectSystemResponse(student, finallyTakeCouseList, RtnCode.SUCCESSFUL.getMessage());
 	}
+	
+//	刪除學生
 	
 //	刪除學生
 
@@ -611,7 +615,7 @@ public class SubjectSystemServiceImpl implements SubjectSystemService {
 		}
 		Optional<Student> studentOp = studentDao.findById(subjectSystemRequest.getStudentNumber());
 		if (!studentOp.isPresent()) {
-			return new SubjectSystemResponse("資料錯誤:此學生不存在");
+			return new SubjectSystemResponse(RtnCode.DATA_IS_EMPTY.getMessage());
 		}
 
 		// 若無選課 > 直接刪除學生資料
@@ -640,21 +644,19 @@ public class SubjectSystemServiceImpl implements SubjectSystemService {
 
 		studentDao.deleteById(subjectSystemRequest.getStudentNumber());
 
-		return new SubjectSystemResponse("刪除學生成功");
+		return new SubjectSystemResponse(RtnCode.SUCCESSFUL.getMessage());
 	}
 	
 //	-----------------------------抽取方法-----------------------------
 	
-
-//  -----------------------------抽取方法-------------------------------
 	private SubjectSystemResponse checkStudentNumber(String subjectSystemRequest) {
 		// 檢查學號
 		if (subjectSystemRequest.isBlank()) {
-			return new SubjectSystemResponse(RtnCode.DATA_ERROR.getMessage());
+			return new SubjectSystemResponse(RtnCode.DATA_MISINPUT.getMessage());
 		}
 		String pattern = "[\\w^_]{5,8}";
 		if (!subjectSystemRequest.matches(pattern)) {
-			return new SubjectSystemResponse(RtnCode.DATA_ERROR.getMessage());
+			return new SubjectSystemResponse(RtnCode.DATA_MISINPUT.getMessage());
 		}
 		return null;
 	}
@@ -662,11 +664,11 @@ public class SubjectSystemServiceImpl implements SubjectSystemService {
 	private SubjectSystemResponse checkCourseNumber(String subjectSystemRequest) {
 		// 檢查課程代碼格式
 		if (subjectSystemRequest.isBlank()) {
-			return new SubjectSystemResponse(RtnCode.DATA_ERROR.getMessage());
+			return new SubjectSystemResponse(RtnCode.DATA_MISINPUT.getMessage());
 		}
 		String pattern = "[\\w^_]{5,8}";
 		if (!subjectSystemRequest.matches(pattern)) {
-			return new SubjectSystemResponse(RtnCode.DATA_ERROR.getMessage());
+			return new SubjectSystemResponse(RtnCode.DATA_MISINPUT.getMessage());
 		}
 		return null;
 	}
