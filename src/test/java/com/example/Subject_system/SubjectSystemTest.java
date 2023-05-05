@@ -152,7 +152,7 @@ public class SubjectSystemTest {
 	
 	@Test
 	public void updateCourseTest() {
-		SubjectSystemRequest req1 = new SubjectSystemRequest("00001", "aaa", "¤T", LocalTime.of(7, 0), LocalTime.of(8, 0), 1);
+		SubjectSystemRequest req1 = new SubjectSystemRequest("00001", "bbb", "¤T", LocalTime.of(8, 0), LocalTime.of(11, 0), 3);
 		SubjectSystemResponse res1 = subjectSystemService.updateCourse(req1);
 		System.out.println("res1:" + res1.getMessage());
 		SubjectSystemRequest req2 = new SubjectSystemRequest("00002", "aaa", "¤T", LocalTime.of(7, 0), LocalTime.of(8, 0), 1);

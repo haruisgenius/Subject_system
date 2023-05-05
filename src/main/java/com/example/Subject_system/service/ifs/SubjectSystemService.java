@@ -25,10 +25,13 @@ public interface SubjectSystemService {
 	//選課
 	public SubjectSystemResponse takeCourse(SubjectSystemRequest subjectSystemRequest);
 	
-	//加選課
+	//加課
 	public SubjectSystemResponse selectCourse(SubjectSystemRequest subjectSystemRequest);
 	
 	//退選
 	public SubjectSystemResponse dropCourse(SubjectSystemRequest subjectSystemRequest);
 	
+	//刪除學生
+	public SubjectSystemResponse deleteStudent(SubjectSystemRequest subjectSystemRequest);
+
 }

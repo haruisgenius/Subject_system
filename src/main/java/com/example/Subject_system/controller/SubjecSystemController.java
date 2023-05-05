@@ -40,19 +40,31 @@ public class SubjecSystemController {
 		return subjectSystemService.findCourseByCourseName(subjectSystemRequest);
 	}
 	
-	@PostMapping(value = "select_course")
-	public SubjectSystemResponse selectCourse(@RequestBody SubjectSystemRequest subjectSystemRequest) {
-		return subjectSystemService.selectCourse(subjectSystemRequest);
+	@PostMapping(value = "update_course")
+	public SubjectSystemResponse updateCourse(@RequestBody SubjectSystemRequest subjectSystemRequest) {
+		return subjectSystemService.updateCourse(subjectSystemRequest);
 	}
-	
+
+	//¿ï½Ò
 	@PostMapping(value = "take_course")
 	public SubjectSystemResponse takeCourse(@RequestBody SubjectSystemRequest subjectSystemRequest) {
 		return subjectSystemService.takeCourse(subjectSystemRequest);
 	}
 	
+	//¥[¿ï½Ò
+	@PostMapping(value = "select_course")
+	public SubjectSystemResponse selectCourse(@RequestBody SubjectSystemRequest subjectSystemRequest) {
+		return subjectSystemService.selectCourse(subjectSystemRequest);
+	}
+	
 	@PostMapping(value = "drop_course")
 	public SubjectSystemResponse dropCourse(@RequestBody SubjectSystemRequest subjectSystemRequest) {
 		return subjectSystemService.dropCourse(subjectSystemRequest);
+	}
+	
+	@PostMapping(value = "delete_student")
+	public SubjectSystemResponse deleteStudent(@RequestBody SubjectSystemRequest subjectSystemRequest) {
+		return subjectSystemService.deleteStudent(subjectSystemRequest);
 	}
 	
 }
