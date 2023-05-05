@@ -1,5 +1,10 @@
 package com.example.Subject_system.vo;
 
+import java.time.LocalTime;
+import java.util.List;
+
+import com.example.Subject_system.entity.Course;
+
 public class SubjectSystemRequest {
 
 	// course list
@@ -9,9 +14,9 @@ public class SubjectSystemRequest {
 
 	private String weekDay;
 
-	private int startTime;
+	private LocalTime startTime;
 
-	private int endTime;
+	private LocalTime endTime;
 
 	private int credits;
 
@@ -23,15 +28,15 @@ public class SubjectSystemRequest {
 
 	private String studentName;
 
-	
+	private List<String> courseNumberList;
 	
 	public SubjectSystemRequest() {
 		super();
 		// TODO Auto-generated constructor stub
 	}
 
-	public SubjectSystemRequest(String courseNumber, String courseName, String weekDay, int startTime, int endTime,
-			int credits) {
+	public SubjectSystemRequest(String courseNumber, String courseName, String weekDay, LocalTime startTime,
+			LocalTime endTime, int credits) {
 		super();
 		this.courseNumber = courseNumber;
 		this.courseName = courseName;
@@ -41,8 +46,12 @@ public class SubjectSystemRequest {
 		this.credits = credits;
 	}
 
-	
-	
+	public SubjectSystemRequest(String studentNumber, List<String> courseNumberList) {
+		super();
+		this.studentNumber = studentNumber;
+		this.courseNumberList = courseNumberList;
+	}
+
 	public SubjectSystemRequest(String courseNumber) {
 		super();
 		this.courseNumber = courseNumber;
@@ -78,19 +87,19 @@ public class SubjectSystemRequest {
 		this.weekDay = weekDay;
 	}
 
-	public int getStartTime() {
+	public LocalTime getStartTime() {
 		return startTime;
 	}
 
-	public void setStrTime(int startTime) {
+	public void setStartTime(LocalTime startTime) {
 		this.startTime = startTime;
 	}
 
-	public int getEndTime() {
+	public LocalTime getEndTime() {
 		return endTime;
 	}
 
-	public void setEndTime(int endTime) {
+	public void setEndTime(LocalTime endTime) {
 		this.endTime = endTime;
 	}
 
@@ -126,8 +135,12 @@ public class SubjectSystemRequest {
 		this.studentName = studentName;
 	}
 
-	public void setStartTime(int startTime) {
-		this.startTime = startTime;
+	public List<String> getCourseNumberList() {
+		return courseNumberList;
+	}
+
+	public void setCourseNumberList(List<String> courseNumberList) {
+		this.courseNumberList = courseNumberList;
 	}
 
 }

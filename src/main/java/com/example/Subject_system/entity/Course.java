@@ -1,5 +1,7 @@
 package com.example.Subject_system.entity;
 
+import java.time.LocalTime;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -24,11 +26,11 @@ public class Course {
 
 	// 開始上課時間
 	@Column(name = "start_time")
-	private int startTime;
+	private LocalTime startTime;
 
 	// 課程結束時間
 	@Column(name = "end_time")
-	private int endTime;
+	private LocalTime endTime;
 
 	// 課程學分
 	@Column(name = "credits")
@@ -42,8 +44,9 @@ public class Course {
 		super();
 		// TODO Auto-generated constructor stub
 	}
-
-	public Course(String courseNumber, String courseName, String weekDay, int startTime, int endTime, int credits) {
+	
+	public Course(String courseNumber, String courseName, String weekDay, LocalTime startTime, LocalTime endTime,
+			int credits) {
 		super();
 		this.courseNumber = courseNumber;
 		this.courseName = courseName;
@@ -53,6 +56,18 @@ public class Course {
 		this.credits = credits;
 	}
 
+	public void updateCourse(String courseName, String weekDay, LocalTime startTime, LocalTime endTime, int credits) {
+		this.courseName = courseName;
+		this.weekDay = weekDay;
+		this.startTime = startTime;
+		this.endTime = endTime;
+		this.credits = credits;
+	}
+	
+	public void updateCourseStudent(int credits) {
+		this.credits = credits;
+	}
+	
 	public String getCourseNumber() {
 		return courseNumber;
 	}
@@ -77,19 +92,19 @@ public class Course {
 		this.weekDay = weekDay;
 	}
 
-	public int getStartTime() {
+	public LocalTime getStartTime() {
 		return startTime;
 	}
 
-	public void setStartTime(int startTime) {
+	public void setStartTime(LocalTime startTime) {
 		this.startTime = startTime;
 	}
 
-	public int getEndTime() {
+	public LocalTime getEndTime() {
 		return endTime;
 	}
 
-	public void setEndTime(int endTime) {
+	public void setEndTime(LocalTime endTime) {
 		this.endTime = endTime;
 	}
 

@@ -22,9 +22,37 @@ public class SubjecSystemController {
 	
 	@PostMapping(value = "add_student")
 	public SubjectSystemResponse addStudent(@RequestBody SubjectSystemRequest subjectSystemRequest) {
-		return subjectSystemService.createCourse(subjectSystemRequest);
+		return subjectSystemService.addStudent(subjectSystemRequest);
 	}
 	
+	@PostMapping(value = "delete_course")
+	public SubjectSystemResponse deleteCourse(@RequestBody SubjectSystemRequest subjectSystemRequest) {
+		return subjectSystemService.deleteCourse(subjectSystemRequest);
+	}
 	
+	@PostMapping(value = "find_course_by_course_number")
+	public SubjectSystemResponse findCourseByCourseNumber(@RequestBody SubjectSystemRequest subjectSystemRequest) {
+		return subjectSystemService.findCourseByCourseNumber(subjectSystemRequest);
+	}
+	
+	@PostMapping(value = "find_course_by_course_name")
+	public SubjectSystemResponse findCourseByCourseName(@RequestBody SubjectSystemRequest subjectSystemRequest) {
+		return subjectSystemService.findCourseByCourseName(subjectSystemRequest);
+	}
+	
+	@PostMapping(value = "select_course")
+	public SubjectSystemResponse selectCourse(@RequestBody SubjectSystemRequest subjectSystemRequest) {
+		return subjectSystemService.selectCourse(subjectSystemRequest);
+	}
+	
+	@PostMapping(value = "take_course")
+	public SubjectSystemResponse takeCourse(@RequestBody SubjectSystemRequest subjectSystemRequest) {
+		return subjectSystemService.takeCourse(subjectSystemRequest);
+	}
+	
+	@PostMapping(value = "drop_course")
+	public SubjectSystemResponse dropCourse(@RequestBody SubjectSystemRequest subjectSystemRequest) {
+		return subjectSystemService.dropCourse(subjectSystemRequest);
+	}
 	
 }

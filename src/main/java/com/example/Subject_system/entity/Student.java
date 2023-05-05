@@ -1,5 +1,6 @@
 package com.example.Subject_system.entity;
 
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -22,15 +23,13 @@ public class Student {
 	@Column(name = "take_course_number")
 	private String takeCourseNumber;
 	
-	//已修課程名稱
-	@Column(name = "take_course_name")
-	private String takeCourseName;
+//	//已修課程名稱
+//	@Column(name = "take_course_name")
+//	private String takeCourseName;
 
 	//總學分
 	@Column(name = "total_credits")
 	private int totalCredits;
-	
-	
 
 	public Student() {
 		super();
@@ -48,6 +47,12 @@ public class Student {
 		this.studentNumber = studentNumber;
 		this.studentName = studentName;
 		this.takeCourseNumber = takeCourseNumber;
+		this.totalCredits = totalCredits;
+	}
+	
+	public void stdSltCourse(String takeCourseNumber,int totalCredits) {
+		this.takeCourseNumber = takeCourseNumber;
+//		this.takeCourseName = takeCourseName;
 		this.totalCredits = totalCredits;
 	}
 
@@ -75,14 +80,6 @@ public class Student {
 		this.takeCourseNumber = takeCorseNumber;
 	}
 
-	public String getTakeCourseName() {
-		return takeCourseName;
-	}
-
-	public void setTakeCourseName(String takeCourseName) {
-		this.takeCourseName = takeCourseName;
-	}
-
 	public int getTotalCredits() {
 		return totalCredits;
 	}
@@ -90,4 +87,6 @@ public class Student {
 	public void setTotalCredits(int totalCredits) {
 		this.totalCredits = totalCredits;
 	}
+
+	
 }
