@@ -34,4 +34,6 @@ public interface SubjectSystemService {
 	//刪除學生
 	public SubjectSystemResponse deleteStudent(SubjectSystemRequest subjectSystemRequest);
 
+	//查詢學生
+	public SubjectSystemResponse findStudent(SubjectSystemRequest subjectSystemRequest);
 }

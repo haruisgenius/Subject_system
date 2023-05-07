@@ -75,4 +75,9 @@ public class SubjecSystemController {
 		return subjectSystemService.deleteStudent(subjectSystemRequest);
 	}
 	
+	//¬d¸ß¾Ç¥Í
+	@PostMapping(value = "find_student")
+	public SubjectSystemResponse findStudent(@RequestBody SubjectSystemRequest subjectSystemRequest) {
+		return subjectSystemService.findStudent(subjectSystemRequest);
+	}
 }

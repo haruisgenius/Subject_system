@@ -34,6 +34,7 @@ public class SubjectSystemServiceImpl implements SubjectSystemService {
 //	新增課程
 	@Override
 	public SubjectSystemResponse createCourse(SubjectSystemRequest subjectSystemRequest) {
+		// 檢查課程代碼格式 > 抽方法
 		SubjectSystemResponse checkResult = checkCourseNumber(subjectSystemRequest.getCourseNumber());
 		if (checkResult != null) {
 			return checkResult;
@@ -44,31 +45,14 @@ public class SubjectSystemServiceImpl implements SubjectSystemService {
 			return new SubjectSystemResponse(RtnCode.DATA_MISINPUT.getMessage());
 		}
 
-		// 檢查星期
-		List<String> week = Arrays.asList("一", "二", "三", "四", "五");
-		if (!StringUtils.hasText(subjectSystemRequest.getWeekDay())) {
-			return new SubjectSystemResponse(RtnCode.DATA_MISINPUT.getMessage());
-		}
-		if (!week.contains(subjectSystemRequest.getWeekDay())) {
-			return new SubjectSystemResponse(RtnCode.DATA_MISINPUT.getMessage());
+		// 檢查上課時間and下課時間 > 抽方法
+		SubjectSystemResponse checkTimeResult = checkWeekdayAndStartOrEndTime(subjectSystemRequest.getWeekDay(),
+				subjectSystemRequest.getStartTime(), subjectSystemRequest.getEndTime());
+		if (checkTimeResult != null) {
+			return checkTimeResult;
 		}
 
-		// 檢查上課時間and下課時間
-		if(subjectSystemRequest.getStartTime() == null || subjectSystemRequest.getEndTime() == null ||
-				subjectSystemRequest.getStartTime().toString().isBlank() || 
-				subjectSystemRequest.getEndTime().toString().isBlank()) {
-			return new SubjectSystemResponse(RtnCode.DATA_MISINPUT.getMessage());
-		}
-		if (subjectSystemRequest.getStartTime().getHour() < 8 || subjectSystemRequest.getStartTime().getHour() > 20
-				|| subjectSystemRequest.getEndTime().getHour() < 8
-				|| subjectSystemRequest.getEndTime().getHour() > 20) {
-			return new SubjectSystemResponse(RtnCode.DATA_MISINPUT.getMessage());
-		}
-		if (subjectSystemRequest.getStartTime().getHour() > subjectSystemRequest.getEndTime().getHour()) {
-			return new SubjectSystemResponse(RtnCode.DATA_MISINPUT.getMessage());
-		}
-
-		// 檢查學分數
+		// 檢查學分數 > 不可小於1或大於3
 		if (subjectSystemRequest.getCredits() < 1 || subjectSystemRequest.getCredits() > 3) {
 			return new SubjectSystemResponse(RtnCode.DATA_MISINPUT.getMessage());
 		}
@@ -88,9 +72,9 @@ public class SubjectSystemServiceImpl implements SubjectSystemService {
 //	新增學生
 	@Override
 	public SubjectSystemResponse addStudent(SubjectSystemRequest subjectSystemRequest) {
-		// 檢查學號
+		// 檢查學號 > 抽方法
 		SubjectSystemResponse checkResult = checkStudentNumber(subjectSystemRequest.getStudentNumber());
-		if(checkResult != null) {
+		if (checkResult != null) {
 			return checkResult;
 		}
 		// 檢查學生姓名是否為空
@@ -111,6 +95,7 @@ public class SubjectSystemServiceImpl implements SubjectSystemService {
 //	刪除課程
 	@Override
 	public SubjectSystemResponse deleteCourse(SubjectSystemRequest subjectSystemRequest) {
+		// 檢查輸入課程代碼格式 > 抽方法
 		SubjectSystemResponse checkResult = checkCourseNumber(subjectSystemRequest.getCourseNumber());
 		if (checkResult != null) {
 			return checkResult;
@@ -131,6 +116,7 @@ public class SubjectSystemServiceImpl implements SubjectSystemService {
 //	查詢課程(課程代碼)
 	@Override
 	public SubjectSystemResponse findCourseByCourseNumber(SubjectSystemRequest subjectSystemRequest) {
+		// 檢查輸入課程代碼格式 > 抽方法
 		SubjectSystemResponse checkResult = checkCourseNumber(subjectSystemRequest.getCourseNumber());
 		if (checkResult != null) {
 			return checkResult;
@@ -151,6 +137,7 @@ public class SubjectSystemServiceImpl implements SubjectSystemService {
 		if (!StringUtils.hasText(subjectSystemRequest.getCourseName())) {
 			return new SubjectSystemResponse(RtnCode.DATA_MISINPUT.getMessage());
 		}
+		// 模糊搜尋
 		List<Course> findCourseNameList = courseDao
 				.findByCourseNameContainingIgnoreCase(subjectSystemRequest.getCourseName());
 		// 檢查課程是否存在
@@ -163,6 +150,7 @@ public class SubjectSystemServiceImpl implements SubjectSystemService {
 //	修改課程
 	@Override
 	public SubjectSystemResponse updateCourse(SubjectSystemRequest subjectSystemRequest) {
+		// 檢查輸入課程代碼格式 > 抽方法
 		SubjectSystemResponse checkResult = checkCourseNumber(subjectSystemRequest.getCourseNumber());
 		if (checkResult != null) {
 			return checkResult;
@@ -177,28 +165,11 @@ public class SubjectSystemServiceImpl implements SubjectSystemService {
 			return new SubjectSystemResponse(RtnCode.DATA_ERROR.getMessage());
 		}
 
-		// 檢查星期
-		List<String> week = Arrays.asList("一", "二", "三", "四", "五");
-		if (!StringUtils.hasText(subjectSystemRequest.getWeekDay())) {
-			return new SubjectSystemResponse(RtnCode.DATA_ERROR.getMessage());
-		}
-		if (!week.contains(subjectSystemRequest.getWeekDay())) {
-			return new SubjectSystemResponse(RtnCode.DATA_ERROR.getMessage());
-		}
-//TODO 抽方法
-		// 檢查上課時間and下課時間
-		if(subjectSystemRequest.getStartTime() == null || subjectSystemRequest.getEndTime() == null ||
-				subjectSystemRequest.getStartTime().toString().isBlank() ||
-				subjectSystemRequest.getEndTime().toString().isBlank()) {
-			return new SubjectSystemResponse(RtnCode.DATA_MISINPUT.getMessage());
-		}
-		if (subjectSystemRequest.getStartTime().getHour() < 8 || subjectSystemRequest.getStartTime().getHour() > 20
-				|| subjectSystemRequest.getEndTime().getHour() < 8
-				|| subjectSystemRequest.getEndTime().getHour() > 20) {
-			return new SubjectSystemResponse(RtnCode.DATA_ERROR.getMessage());
-		}
-		if (subjectSystemRequest.getStartTime().getHour() >= subjectSystemRequest.getEndTime().getHour()) {
-			return new SubjectSystemResponse(RtnCode.DATA_ERROR.getMessage());
+		// 檢查上課時間and下課時間 > 抽方法
+		SubjectSystemResponse checkTimeResult = checkWeekdayAndStartOrEndTime(subjectSystemRequest.getWeekDay(),
+				subjectSystemRequest.getStartTime(), subjectSystemRequest.getEndTime());
+		if (checkTimeResult != null) {
+			return checkTimeResult;
 		}
 
 		// 檢查學分數
@@ -206,8 +177,9 @@ public class SubjectSystemServiceImpl implements SubjectSystemService {
 			return new SubjectSystemResponse(RtnCode.DATA_ERROR.getMessage());
 		}
 
+		// 撈所有學生資料
 		List<Student> allStudentInfoList = studentDao.findAll();
-		//若資料庫無學生 > 直接修改課程資料
+		// 若整個資料庫無學生(學生人數=0) > 直接修改課程資料
 		if (CollectionUtils.isEmpty(allStudentInfoList)) {
 			Course updateCourse = op.get();
 			updateCourse.updateCourse(subjectSystemRequest.getCourseName(), subjectSystemRequest.getWeekDay(),
@@ -216,44 +188,44 @@ public class SubjectSystemServiceImpl implements SubjectSystemService {
 			courseDao.save(updateCourse);
 			return new SubjectSystemResponse(updateCourse, RtnCode.SUCCESSFUL.getMessage());
 		}
-		
+
 		// 修改前學分
 		int orginalCredit = op.get().getCredits();
 		// 修改後學分
 		int newCredeit = subjectSystemRequest.getCredits();
-
+		// 遍歷學生資料
 		for (Student studentInfo : allStudentInfoList) {
-			//若學生無選修課程 > 跳過
+			// 若學生無選修課程 > 跳過
 			if (studentInfo.getTakeCourseNumber() == null) {
 				continue;
-			}else if (studentInfo.getTakeCourseNumber().contains(subjectSystemRequest.getCourseNumber())) {
+			} else if (studentInfo.getTakeCourseNumber().contains(subjectSystemRequest.getCourseNumber())) {
 				// 學生原總學分
 				int studentCredit = studentInfo.getTotalCredits();
-				// 學生新總學分
+				// 學生新總學分 > 原總學分 - 修改前學分 + 修改後學分
 				int newStudentCredit = (studentCredit - orginalCredit) + newCredeit;
+				// 存進學生資料
 				studentInfo.setTotalCredits(newStudentCredit);
 			}
 		}
-		
-		//修改資料存進資料表
+
+		// 修改資料存進資料表
 		Course updateCourse = op.get();
 		updateCourse.updateCourse(subjectSystemRequest.getCourseName(), subjectSystemRequest.getWeekDay(),
 				subjectSystemRequest.getStartTime(), subjectSystemRequest.getEndTime(),
 				subjectSystemRequest.getCredits());
-		//修改資料表存進資料庫
+		// 修改資料表存進資料庫
 		courseDao.save(updateCourse);
 
-		//存學生修改學分後資料
+		// 存學生修改學分後資料進資料庫
 		studentDao.saveAll(allStudentInfoList);
 
 		return new SubjectSystemResponse(updateCourse, RtnCode.SUCCESSFUL.getMessage());
 	}
 
 //	選課
-//	選課
 	@Override
 	public SubjectSystemResponse takeCourse(SubjectSystemRequest subjectSystemRequest) {
-		// 判斷學號輸入內容格式
+		// 判斷學號輸入內容格式 > 抽方法
 		SubjectSystemResponse checkResult = checkStudentNumber(subjectSystemRequest.getStudentNumber());
 		if (checkResult != null) {
 			return checkResult;
@@ -265,7 +237,7 @@ public class SubjectSystemServiceImpl implements SubjectSystemService {
 		}
 		Student student = studentOp.get();
 
-		// 檢查輸入課程代碼格式
+		// 檢查輸入課程代碼格式 > 抽方法
 		for (String item : subjectSystemRequest.getCourseNumberList()) {
 			SubjectSystemResponse checkCResult = checkCourseNumber(item);
 			if (checkCResult != null) {
@@ -273,13 +245,13 @@ public class SubjectSystemServiceImpl implements SubjectSystemService {
 			}
 		}
 
-//			課程不存在
+		// 檢查課程是否存在
 		List<Course> takeCourseList = courseDao.findAllById(subjectSystemRequest.getCourseNumberList());
-		if(takeCourseList.size() != subjectSystemRequest.getCourseNumberList().size()) {
+		if (takeCourseList.size() != subjectSystemRequest.getCourseNumberList().size()) {
 			return new SubjectSystemResponse(RtnCode.DATA_IS_EMPTY.getMessage());
 		}
 
-		// 檢查課程代碼是否重複
+		// 檢查課程代碼&名稱是否重複
 		for (int i = 0; i < takeCourseList.size(); i++) {
 			for (int j = i + 1; j < takeCourseList.size(); j++) {
 				if (takeCourseList.get(i).getCourseNumber().equals(takeCourseList.get(j).getCourseNumber())) {
@@ -290,18 +262,11 @@ public class SubjectSystemServiceImpl implements SubjectSystemService {
 				}
 			}
 		}
-//		TODO 比較相同名稱
-//TODO 抽方法
-		// 檢查課程是否衝堂
-		for (int i = 0; i < takeCourseList.size(); i++) {
-			for (int j = i + 1; j < takeCourseList.size(); j++) {
-				if (takeCourseList.get(i).getWeekDay().equals(takeCourseList.get(j).getWeekDay())) {
-					if (!takeCourseList.get(j).getStartTime().isAfter(takeCourseList.get(i).getEndTime())
-							&& !takeCourseList.get(j).getEndTime().isBefore(takeCourseList.get(i).getStartTime())) {
-						return new SubjectSystemResponse(RtnCode.UPDATE_NOT_ALLOW.getMessage());
-					}
-				}
-			}
+
+		// 檢查課程是否衝堂 > 抽方法
+		SubjectSystemResponse checkCrashCourseResult = crashCourse(takeCourseList, takeCourseList);
+		if(checkCrashCourseResult != null) {
+			return checkCrashCourseResult;
 		}
 
 		// 檢查課程選修人數是否達上限
@@ -324,13 +289,9 @@ public class SubjectSystemServiceImpl implements SubjectSystemService {
 		}
 		student.setTotalCredits(takeCourseTotalCredits);
 
-		// 選課課程代號(字串)加進字串陣列
-//		List<String> takeCourseNumList = new ArrayList<>();
-//		for (String item : subjectSystemRequest.getCourseNumberList()) {
-//			takeCourseNumList.add(item);
-//		}
-
-		List<Course> finallyTakeCouseList = courseDao.findAllByCourseNumberIn(subjectSystemRequest.getCourseNumberList());
+		// 要回傳的課程詳細
+		List<Course> finallyTakeCouseList = courseDao
+				.findAllByCourseNumberIn(subjectSystemRequest.getCourseNumberList());
 		// 將陣列資料轉字串存進學生資訊
 		String allCourseStr = subjectSystemRequest.getCourseNumberList().toString();
 		// 選課字串陣列去前後中括號
@@ -343,22 +304,23 @@ public class SubjectSystemServiceImpl implements SubjectSystemService {
 		int courseStd = 0;
 		// 新選修人數
 		int sltTotalStudent = 0;
+		List<Course> allCourseList = courseDao.findAll();
 		for (Course takeCourse : takeCourseList) {
-			courseStd = takeCourse.getCourseStudent();
-			// 原選修人數+1
-			sltTotalStudent = courseStd + 1;
-			// 將新選修總人數存進資料庫
-			takeCourse.setCourseStudent(sltTotalStudent);
-			courseDao.save(takeCourse);
+			for (Course allCourse : allCourseList) {
+				if (takeCourse.getCourseNumber().equals(allCourse.getCourseNumber())) {
+					courseStd = allCourse.getCourseStudent();
+					// 原選修人數+1
+					sltTotalStudent = courseStd + 1;
+					// 將新選修總人數存進資料庫
+					allCourse.setCourseStudent(sltTotalStudent);
+				}
+			}
 		}
+		courseDao.saveAll(allCourseList);
 		return new SubjectSystemResponse(student, finallyTakeCouseList, RtnCode.SUCCESSFUL.getMessage());
 	}
-	
-//	加選課程
-	
-//	加課
 
-	// 選課
+//	加課
 	@Override
 	public SubjectSystemResponse selectCourse(SubjectSystemRequest subjectSystemRequest) {
 
@@ -383,7 +345,7 @@ public class SubjectSystemServiceImpl implements SubjectSystemService {
 			}
 		}
 
-//		(檢查課程)
+//		(檢查是否已選修課程)
 		if (studentOp.get().getTakeCourseNumber().isEmpty()) {
 			return new SubjectSystemResponse(RtnCode.TAKE_COURSE_NOTYET.getMessage());
 		}
@@ -416,22 +378,17 @@ public class SubjectSystemServiceImpl implements SubjectSystemService {
 				}
 			}
 		}
+		
+//		比較加選課程衝堂
+		SubjectSystemResponse checkSltCrashCourseResult = crashCourse(sltCourseList, sltCourseList);
+		if(checkSltCrashCourseResult != null) {
+			return checkSltCrashCourseResult;
+		}
+
 // 		(比較衝堂----檢查已選與欲選課程時間是否衝突)
-		for (Course stdCourseTime : stdCourseList) { // (已選)
-			LocalTime str1 = stdCourseTime.getStartTime();
-			LocalTime end1 = stdCourseTime.getEndTime();
-			for (Course sltCourseTime : sltCourseList) { // (加選)
-				LocalTime str2 = sltCourseTime.getStartTime();
-				LocalTime end2 = sltCourseTime.getEndTime();
-//TODO 加選課程衝堂比較
-				// 比對星期是否相同
-				if (stdCourseTime.getWeekDay().equals(sltCourseTime.getWeekDay())) {
-					// 比對課堂時間是否衝堂
-					if (!str2.isAfter(end1) && !end2.isBefore(str1)) {
-						return new SubjectSystemResponse(RtnCode.UPDATE_NOT_ALLOW.getMessage());
-					}
-				}
-			}
+		SubjectSystemResponse checkCrashCourseResult = crashCourse(stdCourseList, sltCourseList);
+		if(checkCrashCourseResult != null) {
+			return checkCrashCourseResult;
 		}
 
 //		(個別檢查選修人數是否達上限)
@@ -446,7 +403,6 @@ public class SubjectSystemServiceImpl implements SubjectSystemService {
 		// 欲選總學分
 		int sltTotalCredit = 0;
 		// 學生總學分
-//		int stdTotalCredit = studentDao.findById(subjectSystemRequest.getStudentNumber()).get().getTotalCredits();
 		int stdTotalCredit = studentOp.get().getTotalCredits();
 
 		// 欲選學分加總
@@ -467,12 +423,8 @@ public class SubjectSystemServiceImpl implements SubjectSystemService {
 //(存取已選+加選的課程)	
 
 		List<String> allCourseList = new ArrayList<>();
-//		List<String> stdCList = new ArrayList<>();
 		List<String> sltCList = new ArrayList<>();
-		// 從Course撈課程代碼(字串)加進(已選)字串陣列
-//		for (Course item : stdCourseList) {
-//			stdCList.add(item.getCourseNumber());
-//		}
+
 		// 從Course撈課程代碼(字串)加進(新選)字串陣列
 		for (Course item : sltCourseList) {
 			sltCList.add(item.getCourseNumber());
@@ -504,10 +456,6 @@ public class SubjectSystemServiceImpl implements SubjectSystemService {
 
 		return new SubjectSystemResponse(student, finallyCouseList, RtnCode.SUCCESSFUL.getMessage());
 	}
-	
-//	退選課程
-	
-//	退課
 
 	// 退課
 	@Override
@@ -588,26 +536,29 @@ public class SubjectSystemServiceImpl implements SubjectSystemService {
 		student.setTotalCredits(finallyTotalCredit);
 //		存最終學生資料 進資料庫
 		studentDao.save(student);
-		
+
 //TODO Dao存list
 //		課程資料 扣減選修人數
+		List<Course> allCourseInfoList = courseDao.findAll();
 		// 原選修人數
 		int courseStd = 0;
 		// 新選修人數
 		int newCourseStd = 0;
 		for (Course course : dropCourseList) {
-			courseStd = course.getCourseStudent();
-			newCourseStd = courseStd - 1;
-			course.setCourseStudent(newCourseStd);
-			courseDao.save(course);
+			for (Course CourseInfo : allCourseInfoList) {
+				if (CourseInfo.getCourseNumber().equals(course.getCourseNumber())) {
+					courseStd = CourseInfo.getCourseStudent();
+					newCourseStd = courseStd - 1;
+					CourseInfo.setCourseStudent(newCourseStd);
+
+				}
+			}
 		}
+		courseDao.saveAll(allCourseInfoList);
 
 		return new SubjectSystemResponse(student, finallyTakeCouseList, RtnCode.SUCCESSFUL.getMessage());
 	}
-	
-//	刪除學生
-	
-//	刪除學生
+
 
 	// 刪除學生
 	@Override
@@ -634,26 +585,61 @@ public class SubjectSystemServiceImpl implements SubjectSystemService {
 			takeCourseStrList.add(item.trim());
 		}
 
-		List<Course> takeCourseInfo = courseDao.findAllById(takeCourseStrList);
 //		TODO Dao刪除list
+		List<Course> allCourseInfo = courseDao.findAll();
 		// 原選修人數
 		int courseStd = 0;
 		// 新選修人數
 		int newCourseStd = 0;
-		for (Course course : takeCourseInfo) {
-			courseStd = course.getCourseStudent();
-			newCourseStd = courseStd - 1;
-			course.setCourseStudent(newCourseStd);
-			courseDao.save(course);
+		for (String course : takeCourseStrList) {
+			for (Course courseInfo : allCourseInfo) {
+				if (courseInfo.getCourseNumber().equals(course)) {
+					courseStd = courseInfo.getCourseStudent();
+					newCourseStd = courseStd - 1;
+					courseInfo.setCourseStudent(newCourseStd);
+				}
+			}
 		}
+		courseDao.saveAll(allCourseInfo);
 
 		studentDao.deleteById(subjectSystemRequest.getStudentNumber());
 
 		return new SubjectSystemResponse(RtnCode.SUCCESSFUL.getMessage());
 	}
-	
+
+
+	// 查詢學生
+	@Override
+	public SubjectSystemResponse findStudent(SubjectSystemRequest subjectSystemRequest) {
+		// 檢查學號輸入 > 抽方法
+		SubjectSystemResponse checkResult = checkStudentNumber(subjectSystemRequest.getStudentNumber());
+		if (checkResult != null) {
+			return checkResult;
+		}
+		// 判斷在 學生DB中 是否已存在這個學生ID
+		Optional<Student> studentOp = studentDao.findById(subjectSystemRequest.getStudentNumber());
+		if (!studentOp.isPresent()) {
+			return new SubjectSystemResponse(RtnCode.DATA_IS_EMPTY.getMessage());
+		}
+		Student student = studentOp.get();
+		// 如果沒有修課
+		if (!StringUtils.hasText(student.getTakeCourseNumber())) {
+			return new SubjectSystemResponse(student, RtnCode.SUCCESSFUL.getMessage());
+		}
+
+		// 學生選修課程加入list
+		String[] studentAllCourseStrAry = student.getTakeCourseNumber().split(",");
+		List<String> studentAllCourseList = new ArrayList<>();
+		for (String allCourseStr : studentAllCourseStrAry) {
+			studentAllCourseList.add(allCourseStr.trim());
+		}
+		List<Course> StudentTakeCourse = courseDao.findAllById(studentAllCourseList);
+
+		return new SubjectSystemResponse(student, StudentTakeCourse, RtnCode.SUCCESSFUL.getMessage());
+	}
+
 //	-----------------------------抽取方法-----------------------------
-	
+
 	private SubjectSystemResponse checkStudentNumber(String subjectSystemRequest) {
 		// 檢查學號
 		if (!StringUtils.hasText(subjectSystemRequest)) {
@@ -675,15 +661,55 @@ public class SubjectSystemServiceImpl implements SubjectSystemService {
 		if (!subjectSystemRequest.matches(pattern)) {
 			return new SubjectSystemResponse(RtnCode.DATA_MISINPUT.getMessage());
 		}
-		
+
 		return null;
 	}
-	
-	private SubjectSystemResponse checkWeekdayAndStartOrEndTime(String subjectSystemRequest) {
-		
-		
+
+	// 檢查課程時間格式
+	private SubjectSystemResponse checkWeekdayAndStartOrEndTime(String subjectSystemRequestWeekday,
+			LocalTime subjectSystemRequestStartTime, LocalTime subjectSystemRequestEndTime) {
+		// 檢查星期
+		List<String> week = Arrays.asList("一", "二", "三", "四", "五");
+		if (!StringUtils.hasText(subjectSystemRequestWeekday)) {
+			return new SubjectSystemResponse(RtnCode.DATA_ERROR.getMessage());
+		}
+		if (!week.contains(subjectSystemRequestWeekday)) {
+			return new SubjectSystemResponse(RtnCode.DATA_ERROR.getMessage());
+		}
+		// 檢查上下課時間
+		if (subjectSystemRequestStartTime == null || subjectSystemRequestEndTime == null
+				|| subjectSystemRequestStartTime.toString().isBlank()
+				|| subjectSystemRequestEndTime.toString().isBlank()) {
+			return new SubjectSystemResponse(RtnCode.DATA_MISINPUT.getMessage());
+		}
+		if (subjectSystemRequestStartTime.getHour() < 8 || subjectSystemRequestStartTime.getHour() > 20
+				|| subjectSystemRequestEndTime.getHour() < 8 || subjectSystemRequestEndTime.getHour() > 20) {
+			return new SubjectSystemResponse(RtnCode.DATA_ERROR.getMessage());
+		}
+		if (subjectSystemRequestStartTime.getHour() >= subjectSystemRequestEndTime.getHour()) {
+			return new SubjectSystemResponse(RtnCode.DATA_ERROR.getMessage());
+		}
+
 		return null;
 	}
-	
+
+	private SubjectSystemResponse crashCourse(List<Course> courseList1, List<Course> courseList2) {
+		for (int i = 0; i < courseList1.size(); i++) {
+			String weekDay1 = courseList1.get(i).getWeekDay();
+			LocalTime str1 = courseList1.get(i).getStartTime();
+			LocalTime end1 = courseList1.get(i).getEndTime();
+			for (int j = i + 1; j < courseList2.size(); j++) {
+				String weekDay2 = courseList2.get(j).getWeekDay();
+				LocalTime str2 = courseList2.get(j).getStartTime();
+				LocalTime end2 = courseList2.get(j).getEndTime();
+				if (weekDay1.equals(weekDay2)) {
+					if (!str2.isAfter(end1) && !end2.isBefore(str1)) {
+						return new SubjectSystemResponse(RtnCode.UPDATE_NOT_ALLOW.getMessage());
+					}
+				}
+			}
+		}
+		return null;
+	}
 
 }
